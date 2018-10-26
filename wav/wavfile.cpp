@@ -1,8 +1,7 @@
-﻿#include "wavfile.h"
-#include <iostream>
-#include "fstream"
-#include <cstring>
-int WAV::read(string file_name)
+﻿#include "stdafx.h"
+//#include "wavfile.h"
+
+int WAVFILE::read(string file_name)
 {
 	ifstream fi(file_name, ios::binary);
 	if (!fi.is_open()) std::cout << "Cannot open the file!\n";
@@ -58,19 +57,35 @@ int WAV::read(string file_name)
 	else {
 		// mono
 
-		char * temp = new char[data_size];
+		char *temp = new char[data_size];// 此处有无问题？
+		//cout << "Vector size" << tt.size() << endl;
+		pcm_left = new char[data_size];		// 需要重新分配空间，才能往里边写入
 		fi.read( temp, sizeof(char) * data_size);
-		memcpy(pcm_left, temp, data_size);
-		delete[] temp;
+
+		memcpy((char*)pcm_left, (char *)temp, data_size);
+		cout << " data: \n";
+		double dt= 0;
+		for (size_t nn = 0; nn != 1000/2; ++nn) {
+			unsigned char inv[2];
+			inv[0] = pcm_left[nn];
+			inv[1] = pcm_left[nn + 1 ];	// invert
+			dt = ((inv[1]<<8) | (inv[1])&0xff );
+			//memcpy((char*)&dt, (char *)(inv), 2);
+			cout << dt << endl;
+		}
+		cout << "pcm size: " << sizeof(pcm_left) / sizeof(pcm_left[0]) << endl;
+		//delete[] temp;
+
 		////fi.read( (char*)&pcm_left, sizeof(char) *data_size); // 使用这种方式无法读取，具体原因未知
-		cout << " start to decode the pcm\n";
-		decode_pcm(pcm_left, data_left);
+
+		//cout << " start to decode the pcm\n";
+		//decode_pcm(pcm_left, data_left);
 	}
 
 	return 0;
 }
 
-int WAV::write(string file_name)
+int WAVFILE::write(string file_name)
 {
 	ofstream fo(file_name);
 	//fo.seekp(0);
@@ -95,7 +110,7 @@ int WAV::write(string file_name)
 	return 0;
 }
 
-int WAV::decode_pcm(char * pcm_data, float *data)
+int WAVFILE::decode_pcm(char * pcm_data, float *data)
 {
 	//DecodePcm
 	data = new float[data_size / bits_per_sample];	// 点数 = PCM 总长 / 比特率
@@ -111,7 +126,7 @@ int WAV::decode_pcm(char * pcm_data, float *data)
 	return 0;
 }
 
-WAV::~WAV()
+WAVFILE::~WAVFILE()
 {
 	delete [] pcm_left;						
 	delete[] pcm_right;

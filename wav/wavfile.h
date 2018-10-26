@@ -1,13 +1,15 @@
 ﻿#pragma once
-// www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html 
+ //www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html 
 #include <string>
 #include <fstream>
-#include "fstream"
 #include <iostream>
 #include <vector>
+
+//#include <cstring>
+
 using namespace std;
 
-class WAV {
+class WAVFILE {
 public:
 	/* WAV-header parameters				Memory address - Occupied space - Describes */
 	char chunk_ID[4];                           // 0x00 4 byte - RIFF string
@@ -26,10 +28,14 @@ public:
 												//				that will be read,that is the size of PCM data.
 
 	std::uint16_t  sample_numbers;
+
+	vector<char> PCM;			// store the pcm data
+
+	//
 	//unsigned char *data;						// a pointer 
 	char *pcm_left ;							// a pointer 
 	char *pcm_right = nullptr;					// a pointer 
-	float *data_left = nullptr;
+	float *data_left ;
 	float *data_right = nullptr;
 
 	int read(string file_name);
@@ -40,5 +46,5 @@ public:
 	uint16_t getSampleRate();
 	uint16_t getByteRate();
 
-	~WAV();
+	~WAVFILE();
 }; 

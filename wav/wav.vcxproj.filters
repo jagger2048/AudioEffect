@@ -32,5 +32,8 @@
     <ClCompile Include="wav.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="wavfile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
