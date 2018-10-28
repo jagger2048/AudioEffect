@@ -24,7 +24,9 @@ int WAVFILE::read(string file_name)
 	fi.read((char*)&data_chunk_header, sizeof(data_chunk_header));
 	fi.read((char*)&data_size, sizeof(data_size));
 
-	sample_numbers = data_size / bits_per_sample;
+	sample_numbers = data_size / bits_per_sample; // bits_per_sample 16 bits=2
+
+	// 增加文件错误处理函数
 	if (int( fi.tellg() ) != 44) {
 		cout << " Cannot read the wac file's header";
 	}
@@ -58,23 +60,18 @@ int WAVFILE::read(string file_name)
 		// mono
 
 		char *temp = new char[data_size];// 此处有无问题？
-		//cout << "Vector size" << tt.size() << endl;
 		pcm_left = new char[data_size];		// 需要重新分配空间，才能往里边写入
 		fi.read( temp, sizeof(char) * data_size);
 
 		memcpy((char*)pcm_left, (char *)temp, data_size);
 		cout << " data: \n";
 		double dt= 0;
-		for (size_t nn = 0; nn != 1000/2; ++nn) {
-			unsigned char inv[2];
-			inv[0] = pcm_left[nn];
-			inv[1] = pcm_left[nn + 1 ];	// invert
-			dt = ((inv[1]<<8) | (inv[1])&0xff );
-			//memcpy((char*)&dt, (char *)(inv), 2);
-			cout << dt << endl;
+		for (size_t nn = 0; nn != 100; nn+=2 ) {
+			dt = (pcm_left[nn + 1] << 8 | pcm_left[nn]) / 32768.0;
+			cout <<"No "<<nn/2<<" :" <<dt << endl;
 		}
-		cout << "pcm size: " << sizeof(pcm_left) / sizeof(pcm_left[0]) << endl;
-		//delete[] temp;
+		//cout << "pcm size: " << sizeof(pcm_left) / sizeof(pcm_left[0]) << endl;
+		delete[] temp;
 
 		////fi.read( (char*)&pcm_left, sizeof(char) *data_size); // 使用这种方式无法读取，具体原因未知
 
