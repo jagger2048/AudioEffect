@@ -35,7 +35,7 @@ public:
 	//unsigned char *data;						// a pointer 
 	char *pcm_left ;							// a pointer 
 	char *pcm_right = nullptr;					// a pointer 
-	float *data_left ;
+	float *data_left = nullptr ;
 	float *data_right = nullptr;
 
 	int read(string file_name);

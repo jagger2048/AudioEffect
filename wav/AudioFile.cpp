@@ -24,7 +24,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <iterator>
-
+#include <time.h>
 //=============================================================
 // Pre-defined 10-byte representations of common sample rates
 std::unordered_map <uint32_t, std::vector<uint8_t>> aiffSampleRateTable = {
@@ -718,12 +718,12 @@ bool AudioFile<T>::writeDataToFile (std::vector<uint8_t>& fileData, std::string 
     
     if (outputFile.is_open())
     {
-        // for (int i = 0; i < fileData.size(); i++)
-        // {
-        //     char value = (char) fileData[i];
-        //     outputFile.write (&value, sizeof (char));
-        // }
-        outputFile.write( (char*)&fileData[0] , fileData.size() );
+		//for (int i = 0; i < fileData.size(); i++)
+		//{
+		//	char value = (char)fileData[i];
+		//	outputFile.write(&value, sizeof(char));
+		//}
+		outputFile.write((char*)&fileData[0], fileData.size());
         outputFile.close();
         
         return true;

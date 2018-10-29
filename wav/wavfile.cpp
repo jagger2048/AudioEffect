@@ -38,47 +38,40 @@ int WAVFILE::read(string file_name)
 		// stereo
 		bool channel_select = true;
 
-
 		size_t countL = 0;
 		size_t countR = 0;
 		while (fi.good()) {
 			if (channel_select) {
-				fi.read((char*)&pcm_left + countL * bits_per_sample, bits_per_sample);
+				fi.read((char*)&pcm_left + (countL++) * bits_per_sample, bits_per_sample);
 				channel_select = false;
 			}
 			else {
 				channel_select = true;
-				fi.read(pcm_right + countR * bits_per_sample, bits_per_sample);
+				fi.read(pcm_right + (countR++) * bits_per_sample, bits_per_sample);
 			}
 		}
 
-		//decode_pcm(pcm_left, data_left);
-		//decode_pcm(pcm_right, data_right);
+		decode_pcm(pcm_left, data_left);
+		decode_pcm(pcm_right, data_right);
 
 	}
 	else {
 		// mono
 
-		char *temp = new char[data_size];// 此处有无问题？
+		//char *temp = new char[data_size];	// 此处有无问题？
 		pcm_left = new char[data_size];		// 需要重新分配空间，才能往里边写入
-		fi.read( temp, sizeof(char) * data_size);
+		//fi.read( temp, sizeof(char) * data_size);
+		fi.read( pcm_left, sizeof(char) * data_size);
 
-		memcpy((char*)pcm_left, (char *)temp, data_size);
-		cout << " data: \n";
-		double dt= 0;
-		for (size_t nn = 0; nn != 100; nn+=2 ) {
-			dt = (pcm_left[nn + 1] << 8 | pcm_left[nn]) / 32768.0;
-			cout <<"No "<<nn/2<<" :" <<dt << endl;
-		}
-		//cout << "pcm size: " << sizeof(pcm_left) / sizeof(pcm_left[0]) << endl;
-		delete[] temp;
+		//memcpy((char*)pcm_left, (char *)temp, data_size);
 
-		////fi.read( (char*)&pcm_left, sizeof(char) *data_size); // 使用这种方式无法读取，具体原因未知
+		//delete[] temp;
 
-		//cout << " start to decode the pcm\n";
-		//decode_pcm(pcm_left, data_left);
+
+		decode_pcm(pcm_left, data_left);
 	}
 
+	fi.close();
 	return 0;
 }
 
@@ -112,15 +105,22 @@ int WAVFILE::decode_pcm(char * pcm_data, float *data)
 	//DecodePcm
 	data = new float[data_size / bits_per_sample];	// 点数 = PCM 总长 / 比特率
 	unsigned short decode_temp = 0;// default 16 bite
-	cout << "start decode\n";
-	for (size_t n = 0; n != data_size / bits_per_sample; ++n) {
 
-		
-		//memcpy( &decode_temp, pcm_data + n * bits_per_sample, bits_per_sample);
-		data[n] = (float)decode_temp;
+	cout << "start decode\n";
+
+	cout << " data: \n";
+	// bits_per_sample = 2
+	double dt = 0;
+	int data_index = 0;
+	for (size_t nn = 0; nn != data_size; nn += 2) {
+		//data[data_index++] = (pcm_left[nn + 1] << 8 | pcm_left[nn]) / 32768.0;
+		data[data_index++] = 0.6;// 有问题
+		//cout << "No " << nn / 2 << " :" << dt << endl;
 	}
+
 	cout << "Decoded\n";
 	return 0;
+
 }
 
 WAVFILE::~WAVFILE()
